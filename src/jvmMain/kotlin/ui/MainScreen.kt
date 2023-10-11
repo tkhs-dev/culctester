@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -20,6 +22,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 @Preview
 fun MainScreen(screenModel: MainScreenModel){
+    val uiState by screenModel.uiState.collectAsState()
+
     Row(
         horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.Top,
@@ -116,12 +120,12 @@ fun MainScreen(screenModel: MainScreenModel){
                 .background(color = Color(0xFFFFFFFF), shape = RoundedCornerShape(size = 2.dp))
                 .padding(start = 38.dp, top = 40.dp, end = 14.dp, bottom = 35.dp)
         ) {
-            settingBoolElem("減算を含む", true, {})
-            settingBoolElem("乗算を含む", true, {})
-            settingBoolElem("二桁以上の整数を含む", true, {})
-            settingBoolElem("負の数を含む", true, {})
-            settingIntElem("ネストの深さ", 10, {})
-            settingIntElem("数式の最大の長さ(文字)", 200, {})
+            settingBoolElem("減算を含む", uiState.containSub, {screenModel.onUiStateChanged(uiState.copy(containSub = it))})
+            settingBoolElem("乗算を含む", uiState.containMul, {screenModel.onUiStateChanged(uiState.copy(containMul = it))})
+            settingBoolElem("二桁以上の整数を含む", uiState.containMoreDigits, {screenModel.onUiStateChanged(uiState.copy(containMoreDigits = it))})
+            settingBoolElem("負の数を含む", uiState.containNegative, {screenModel.onUiStateChanged(uiState.copy(containNegative = it))})
+            settingIntElem("ネストの深さ", uiState.depth, {screenModel.onUiStateChanged(uiState.copy(depth = it)) })
+            settingIntElem("数式の最大の長さ(文字)", uiState.maxLength, {screenModel.onUiStateChanged(uiState.copy(maxLength = it))})
             Box(Modifier.weight(1f))
             ElevatedButton(onClick = {  },
                 modifier = Modifier.width(300.dp).height(60.dp),
@@ -169,6 +173,6 @@ private fun settingIntElem(text: String, value: Int, onValueChange: (Int) -> Uni
                 ))
         }
         Box(Modifier.weight(1f))
-        OutlinedTextField(value = value.toString(), onValueChange = { onValueChange(it.toInt()) }, modifier = Modifier.width(70.dp).height(45.dp))
+        OutlinedTextField(value = value.toString(), onValueChange = { it.toIntOrNull()?.let{onValueChange(it)} }, modifier = Modifier.width(70.dp).height(45.dp))
     }
 }
