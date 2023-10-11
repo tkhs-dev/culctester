@@ -14,6 +14,11 @@ import logic.Formula
 import logic.Formula.*
 import logic.Generator
 import org.apache.commons.exec.CommandLine
+import org.apache.commons.exec.DefaultExecutor
+import org.apache.commons.exec.ExecuteWatchdog
+import org.apache.commons.exec.PumpStreamHandler
+import ui.MainScreen
+import ui.MainScreenModel
 import java.io.File
 import java.io.FileFilter
 import java.nio.file.Paths
@@ -25,34 +30,40 @@ fun App() {
     var text by remember { mutableStateOf("Hello, World!") }
 
     MaterialTheme {
-        Button(onClick = {
-            text = File("test").absolutePath
-        }) {
-            Text(text)
-        }
+        MainScreen(MainScreenModel())
     }
 }
 
-//fun main() = application {
-//    Window(onCloseRequest = ::exitApplication) {
-//        App()
+fun main() = application {
+    Window(onCloseRequest = ::exitApplication, title = "計算機テストツール") {
+        App()
+    }
+}
+
+//fun main() {
+////    print("generating...\n")
+////    val  startTime = System.currentTimeMillis()
+////    runBlocking {
+////        (0..100).map {
+////            async {Generator().generate(1,100)}
+////        }.awaitAll()
+////    }.forEach(::println)
+////    val  endTime = System.currentTimeMillis()
+////    print("----GENERATED----\n")
+////    print("time:${endTime-startTime}ms\n")
+////
+//    val files = File("test").also { if(!it.exists()) it.mkdir() }
+//        .listFiles { it -> it?.name?.endsWith(".exe") ?: false }
+//
+//    val cmd = CommandLine(files.first().absolutePath)
+//    val executor = DefaultExecutor()
+//    val watchdog = ExecuteWatchdog(60000)
+//    executor.watchdog = watchdog
+//
+//    runCatching {
+//        val hndlr = PumpStreamHandler(System.out,System.err,System.`in`)
+//        executor.streamHandler = hndlr
+//        executor.setExitValue(0)
+//        executor.execute(cmd)
 //    }
 //}
-
-fun main() {
-//    print("generating...\n")
-//    val  startTime = System.currentTimeMillis()
-//    runBlocking {
-//        (0..100).map {
-//            async {Generator().generate(1,100)}
-//        }.awaitAll()
-//    }.forEach(::println)
-//    val  endTime = System.currentTimeMillis()
-//    print("----GENERATED----\n")
-//    print("time:${endTime-startTime}ms\n")
-//
-    val files = File("test").also { if(!it.exists()) it.mkdir() }
-        .listFiles { it -> it?.name?.endsWith(".exe") ?: false }
-    print(files.first().absolutePath)
-    val cmd = CommandLine(files.first().absolutePath)
-}
