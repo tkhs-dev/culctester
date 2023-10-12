@@ -4,11 +4,12 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -18,11 +19,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
+import logic.Formula
 
 @Composable
 @Preview
 fun MainScreen(screenModel: MainScreenModel){
     val uiState by screenModel.uiState.collectAsState()
+    val formulaFlow by screenModel.formula.collectAsState()
+    val formula by remember{
+        val data = mutableListOf<Formula>()
+
+        derivedStateOf {
+            formulaFlow?.let { data.add(it) }
+            data
+        }
+    }
+    val scope = rememberCoroutineScope()
+    val lazyState = rememberLazyListState()
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
@@ -30,7 +44,7 @@ fun MainScreen(screenModel: MainScreenModel){
     ) {
         Row(Modifier.weight(1f)) {
             Box(Modifier.weight(1f))
-            Column(modifier = Modifier.width(900.dp).padding(0.dp, 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(modifier = Modifier.width(900.dp).padding(10.dp, 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Box(Modifier.background(Color.Black,shape = RoundedCornerShape(size = 5.dp)).height(90.dp).width(600.dp).align(Alignment.CenterHorizontally))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp,Alignment.End), modifier = Modifier.width(600.dp).height(50.dp).align(Alignment.CenterHorizontally)) {
                     ElevatedButton(onClick = {  },
@@ -48,7 +62,7 @@ fun MainScreen(screenModel: MainScreenModel){
                             )
                         )
                     }
-                    ElevatedButton(onClick = {  },
+                    ElevatedButton(onClick = { scope.launch{screenModel.onRetryClicked()} },
                         modifier = Modifier.width(160.dp).height(35.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A5D9)),
                         shape = RoundedCornerShape(size = 5.dp),
@@ -66,9 +80,9 @@ fun MainScreen(screenModel: MainScreenModel){
                 }
                 Column(Modifier.background(color = Color(0xFF383838), shape = RoundedCornerShape(size = 10.dp)).fillMaxWidth().fillMaxHeight()) {
                     Row(Modifier.padding(15.dp,8.dp,0.dp,0.dp)) {
-                        Button(onClick = {  },
+                        Button(onClick = { screenModel.onUiStateChanged(uiState.copy(tab = MainScreenModel.UiState.Tab.ERROR)) },
                             modifier = Modifier.width(200.dp).height(35.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                            colors = ButtonDefaults.buttonColors(containerColor = if(uiState.tab == MainScreenModel.UiState.Tab.ERROR)Color.Black else Color.Transparent),
                             shape = RoundedCornerShape(10.dp,10.dp,0.dp,0.dp),
                             contentPadding = PaddingValues(0.dp),
                             elevation = ButtonDefaults.buttonElevation(5.dp)
@@ -81,9 +95,9 @@ fun MainScreen(screenModel: MainScreenModel){
                             )
                             )
                         }
-                        Button(onClick = {  },
+                        Button(onClick = { screenModel.onUiStateChanged(uiState.copy(tab = MainScreenModel.UiState.Tab.SUCCESS)) },
                             modifier = Modifier.width(200.dp).height(35.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                            colors = ButtonDefaults.buttonColors(containerColor = if(uiState.tab == MainScreenModel.UiState.Tab.SUCCESS)Color.Black else Color.Transparent),
                             shape = RoundedCornerShape(10.dp,10.dp,0.dp,0.dp),
                             contentPadding = PaddingValues(0.dp),
                             elevation = ButtonDefaults.buttonElevation(5.dp)
@@ -97,15 +111,17 @@ fun MainScreen(screenModel: MainScreenModel){
                             )
                         }
                     }
-                    Column(modifier = Modifier.background(Color.Black, shape = RoundedCornerShape(8.dp)).fillMaxWidth().fillMaxHeight().padding(20.dp)) {
-                        Text("失敗ケースがありません",
-                            style = TextStyle(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight(400),
-                                textAlign = TextAlign.Center,
-                            ),
-                            color = Color.White
-                        )
+                    LazyColumn(state = lazyState, modifier = Modifier.background(Color.Black, shape = RoundedCornerShape(8.dp)).fillMaxWidth().fillMaxHeight().padding(20.dp)) {
+                        items(formula) {
+                            Text(it.toString(),
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight(400),
+                                    textAlign = TextAlign.Center,
+                                ),
+                                color = Color.White
+                            )
+                        }
                     }
                 }
             }
@@ -127,7 +143,7 @@ fun MainScreen(screenModel: MainScreenModel){
             settingIntElem("ネストの深さ", uiState.depth, {screenModel.onUiStateChanged(uiState.copy(depth = it)) })
             settingIntElem("数式の最大の長さ(文字)", uiState.maxLength, {screenModel.onUiStateChanged(uiState.copy(maxLength = it))})
             Box(Modifier.weight(1f))
-            ElevatedButton(onClick = {  },
+            ElevatedButton(onClick = { scope.launch{screenModel.onExecuteClicked()} },
                 modifier = Modifier.width(300.dp).height(60.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A5D9)),
                 shape = RoundedCornerShape(size = 5.dp),
