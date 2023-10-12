@@ -9,7 +9,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -20,21 +23,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import logic.Formula
+import logic.TestResult
 
 @Composable
 @Preview
 fun MainScreen(screenModel: MainScreenModel){
     val uiState by screenModel.uiState.collectAsState()
-    val formulaFlow by screenModel.formula.collectAsState()
-    val formula by remember{
-        val data = mutableListOf<Formula>()
+    val results by screenModel.testResult.collectAsState()
 
-        derivedStateOf {
-            formulaFlow?.let { data.add(it) }
-            data
-        }
-    }
     val scope = rememberCoroutineScope()
     val lazyState = rememberLazyListState()
 
@@ -112,7 +108,12 @@ fun MainScreen(screenModel: MainScreenModel){
                         }
                     }
                     LazyColumn(state = lazyState, modifier = Modifier.background(Color.Black, shape = RoundedCornerShape(8.dp)).fillMaxWidth().fillMaxHeight().padding(20.dp)) {
-                        items(formula) {
+                        items(
+                            if(uiState.tab == MainScreenModel.UiState.Tab.ERROR)
+                                results.filterIsInstance<TestResult.Failure>()
+                            else
+                                results.filterIsInstance<TestResult.Success>()
+                        ){
                             Text(it.toString(),
                                 style = TextStyle(
                                     fontSize = 14.sp,
