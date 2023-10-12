@@ -1,12 +1,10 @@
 package ui
 
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logic.Formula
 import logic.Generator
-import java.awt.image.ByteLookupTable
+import logic.TestResult
+import logic.Tester
 
 class MainScreenModel() {
     data class UiState(
@@ -28,7 +26,8 @@ class MainScreenModel() {
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
 
-    val formula = MutableStateFlow<Formula?>(null)
+    private val _testResults = MutableStateFlow(listOf<TestResult>())
+    val testResult = _testResults.asStateFlow()
 
     fun generateFormula(): Flow<Formula>{
         return flow {
@@ -44,9 +43,11 @@ class MainScreenModel() {
 
     suspend fun onExecuteClicked() {
         println("generate clicked")
-        generateFormula().collect {
-            formula.emit(it)
-        }
+        val generator = Generator()
+        val tester = Tester()
+        _testResults.value = (1..100).map { generator.generate(depth = 1, maxNum = 100) }
+            .map { tester.test(it) }
+            .toList()
     }
 
     suspend fun onRetryClicked() {
