@@ -9,7 +9,7 @@ import kotlin.random.Random
 class Generator(
     val operator: Set<Formula.Operator> = setOf(Formula.Operator.Add, Formula.Operator.Sub, Formula.Operator.Mul),
 ) {
-    suspend fun generate(depth:Int = 0,maxNum: Int): Formula {
+    suspend fun generate(depth:Int = 0, maxNum: Int = 10): Formula {
         return _generate(depth,maxNum, depth > 0 && Math.random() > 0.8)
     }
     private suspend fun _generate(depth: Int, maxNum: Int,isNested: Boolean): Formula {
