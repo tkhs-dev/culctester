@@ -27,6 +27,8 @@ kotlin {
                 implementation(compose.material3)
 
                 implementation("org.apache.commons:commons-exec:1.3")
+
+                implementation("net.objecthunter:exp4j:0.4.8")
             }
         }
         val jvmTest by getting
