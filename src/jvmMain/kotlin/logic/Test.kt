@@ -29,18 +29,19 @@ sealed class CalcResult{
 
 
 class Tester(){
-    private val cmd:CommandLine
-    private val executor = DefaultExecutor()
+    private val filePath:String
 
     init{
         val files = File("test").also { if(!it.exists()) it.mkdir() }
             .listFiles { it -> it?.name?.endsWith(".exe") ?: false }
-        cmd = CommandLine(files.first().absolutePath)
-        val watchdog = ExecuteWatchdog(60000)
-        executor.watchdog = watchdog
+        filePath = files.first().absolutePath
     }
 
     private fun calcBySubject(formula: Formula): CalcResult{
+        val cmd = CommandLine(filePath)
+        val executor = DefaultExecutor()
+        val watchdog = ExecuteWatchdog(60000)
+        executor.watchdog = watchdog
         val input = ByteArrayInputStream(formula.toString().toByteArray())
         val output = ByteArrayOutputStream()
         val error = ByteArrayOutputStream()

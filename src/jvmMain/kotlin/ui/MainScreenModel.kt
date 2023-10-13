@@ -1,6 +1,10 @@
 package ui
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
 import logic.Formula
 import logic.Generator
 import logic.TestResult
@@ -43,9 +47,16 @@ class MainScreenModel() {
         if(_uiState.value.containMul) op.add(Formula.Operator.Mul)
         val generator = Generator(op)
         val tester = Tester()
-        _testResults.value = (1.._uiState.value.trialCount).map { generator.generate(depth = _uiState.value.depth, maxNum = if(_uiState.value.containMoreDigits) 999 else 9, allowNegative = _uiState.value.containNegative, allowOuterBracket = _uiState.value.allowOuterBracket) }
-            .map { tester.test(it) }
-            .toList()
+
+        _testResults.value = runBlocking(Dispatchers.Default) {
+            (1.._uiState.value.trialCount)
+                .map {
+                    async {
+                        val f = generator.generate(depth = _uiState.value.depth, maxNum = if(_uiState.value.containMoreDigits) 999 else 9, allowNegative = _uiState.value.containNegative, allowOuterBracket = _uiState.value.allowOuterBracket)
+                        tester.test(f)
+                    }
+                }.awaitAll()
+        }
     }
 
     suspend fun onRetryClicked() {
