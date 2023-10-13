@@ -59,6 +59,9 @@ class Tester(){
         }.onFailure {
             return CalcResult.Error(formula,it)
         }
+        input.close()
+        output.close()
+        error.close()
         return CalcResult.Error(formula,Exception("unknown internal error"))
     }
 
