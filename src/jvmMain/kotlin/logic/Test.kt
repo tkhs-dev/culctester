@@ -26,6 +26,11 @@ sealed class TestResult(val formula: Formula){
                 return "InvalidFormula"
             }
         }
+        object Overflow: Result(){
+            override fun toString(): String {
+                return "Overflow"
+            }
+        }
     }
 }
 
@@ -93,6 +98,8 @@ class Tester(){
         if(expect is CalcResult.Success && actual is CalcResult.Success){
             if(expect.result == actual.result){
                 return TestResult.Success(formula,TestResult.Result.Number(expect.result))
+            }else if(expect.result == Int.MAX_VALUE || expect.result == Int.MIN_VALUE){
+                return TestResult.Failure(formula,TestResult.Result.Overflow,TestResult.Result.Overflow)
             }else{
                 return TestResult.Failure(formula,TestResult.Result.Number(expect.result),TestResult.Result.Number(actual.result))
             }
