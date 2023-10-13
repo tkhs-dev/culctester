@@ -14,6 +14,7 @@ class MainScreenModel() {
         val containNegative: Boolean = false,
         val depth: Int = 0,
         val maxLength: Int = 200,
+        val trialCount: Int = 100,
 
         val tab: Tab = Tab.ERROR,
     ){
@@ -29,23 +30,19 @@ class MainScreenModel() {
     private val _testResults = MutableStateFlow(listOf<TestResult>())
     val testResult = _testResults.asStateFlow()
 
-    fun generateFormula(): Flow<Formula>{
-        return flow {
-            repeat(10000){
-                emit(Generator().generate(1,100))
-            }
-        }
-    }
-
     fun onUiStateChanged(uiState: UiState) {
         _uiState.value = uiState
     }
 
     suspend fun onExecuteClicked() {
         println("generate clicked")
-        val generator = Generator()
+        val op = mutableSetOf<Formula.Operator>()
+        op.add(Formula.Operator.Add)
+        if(_uiState.value.containSub) op.add(Formula.Operator.Sub)
+        if(_uiState.value.containMul) op.add(Formula.Operator.Mul)
+        val generator = Generator(op)
         val tester = Tester()
-        _testResults.value = (1..100).map { generator.generate(depth = 1, maxNum = 100) }
+        _testResults.value = (1.._uiState.value.trialCount).map { generator.generate(depth = _uiState.value.depth, maxNum = if(_uiState.value.containMoreDigits) 999 else 9, allowNegative = _uiState.value.containNegative) }
             .map { tester.test(it) }
             .toList()
     }
