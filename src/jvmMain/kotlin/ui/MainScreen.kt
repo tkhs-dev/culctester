@@ -91,21 +91,21 @@ fun MainScreen(screenModel: MainScreenModel){
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp,Alignment.End), modifier = Modifier.width(600.dp).height(50.dp).align(Alignment.CenterHorizontally)) {
-                    ElevatedButton(onClick = {  },
-                        modifier = Modifier.width(90.dp).height(35.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A5D9)),
-                        shape = RoundedCornerShape(size = 5.dp),
-                        contentPadding = PaddingValues(0.dp),
-                        elevation = ButtonDefaults.buttonElevation(5.dp)
-                    ) {
-                        Text("書き出し",
-                            style = TextStyle(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight(700),
-                                textAlign = TextAlign.Center,
-                            )
-                        )
-                    }
+//                    ElevatedButton(onClick = {  },
+//                        modifier = Modifier.width(90.dp).height(35.dp),
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A5D9)),
+//                        shape = RoundedCornerShape(size = 5.dp),
+//                        contentPadding = PaddingValues(0.dp),
+//                        elevation = ButtonDefaults.buttonElevation(5.dp)
+//                    ) {
+//                        Text("書き出し",
+//                            style = TextStyle(
+//                                fontSize = 14.sp,
+//                                fontWeight = FontWeight(700),
+//                                textAlign = TextAlign.Center,
+//                            )
+//                        )
+//                    }
                     ElevatedButton(onClick = { scope.launch{ withContext(Dispatchers.Default){screenModel.onRetryClicked()}} },
                         modifier = Modifier.width(160.dp).height(35.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A5D9)),
