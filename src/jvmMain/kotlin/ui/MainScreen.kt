@@ -143,6 +143,7 @@ fun MainScreen(screenModel: MainScreenModel){
             settingBoolElem("負の数を含む", uiState.containNegative, {screenModel.onUiStateChanged(uiState.copy(containNegative = it))})
             settingIntElem("ネストの深さ", uiState.depth, {screenModel.onUiStateChanged(uiState.copy(depth = it)) })
             settingIntElem("数式の最大の長さ(文字)", uiState.maxLength, {screenModel.onUiStateChanged(uiState.copy(maxLength = it))})
+            settingIntElem( "試行回数", uiState.trialCount, {screenModel.onUiStateChanged(uiState.copy(trialCount = it))})
             Box(Modifier.weight(1f))
             ElevatedButton(onClick = { scope.launch{screenModel.onExecuteClicked()} },
                 modifier = Modifier.width(300.dp).height(60.dp),
