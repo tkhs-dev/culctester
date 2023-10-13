@@ -10,12 +10,12 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.StringReader
 
-sealed class TestResult{
-    data class Success(val formula: Formula, val result: Result): TestResult()
-    data class Failure(val formula: Formula, val expect: Result, val actual: Result): TestResult()
-    data class Error(val formula: Formula, val error: Throwable): TestResult()
+sealed class TestResult(val formula: Formula){
+    data class Success(private val _formula: Formula, val result: Result): TestResult(_formula)
+    data class Failure(private val _formula: Formula, val expect: Result, val actual: Result): TestResult(_formula)
+    data class Error(private val _formula: Formula, val error: Throwable): TestResult(_formula)
 
-    sealed class Result(): TestResult(){
+    sealed class Result(){
         data class Number(val value: Int): Result()
         object InvalidFormula: Result()
     }
