@@ -53,7 +53,16 @@ class MainScreenModel() {
             (1.._uiState.value.trialCount)
                 .map {
                     async {
-                        val f = generator.generate(depth = _uiState.value.depth, maxNum = if(_uiState.value.containMoreDigits) 999 else 9, allowNegative = _uiState.value.containNegative, allowOuterBracket = _uiState.value.allowOuterBracket)
+                        var f = generator.generate(depth = _uiState.value.depth, maxNum = if(_uiState.value.containMoreDigits) 999 else 9, allowNegative = _uiState.value.containNegative, allowOuterBracket = _uiState.value.allowOuterBracket)
+                        var count: Int = 0
+                        while(f.toString().length > _uiState.value.maxLength){
+                            f = generator.generate(depth = _uiState.value.depth, maxNum = if(_uiState.value.containMoreDigits) 999 else 9, allowNegative = _uiState.value.containNegative, allowOuterBracket = _uiState.value.allowOuterBracket)
+                            count++
+                            if(count > 100){
+                                f = Formula(Formula.Operand.Number(0),null,null)
+                                break
+                            }
+                        }
                         tester.test(f)
                     }
                 }.awaitAll()
