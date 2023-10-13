@@ -109,21 +109,23 @@ fun MainScreen(screenModel: MainScreenModel){
                             )
                         }
                     }
-                    LazyColumn(state = lazyState, modifier = Modifier.background(Color.Black, shape = RoundedCornerShape(8.dp)).fillMaxWidth().fillMaxHeight().padding(20.dp)) {
-                        items(
-                            if(uiState.tab == MainScreenModel.UiState.Tab.ERROR)
-                                results.filterIsInstance<TestResult.Failure>().map { "${it.formula.toString()} expect=${it.expect} actual=${it.actual}" }
-                            else
-                                results.filterIsInstance<TestResult.Success>().map { "${it.formula.toString()} result=${it.result}"}
-                        ){
-                            Text(it.toString(),
-                                style = TextStyle(
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight(400),
-                                    textAlign = TextAlign.Center,
-                                ),
-                                color = Color.White
-                            )
+                    SelectionContainer {
+                        LazyColumn(state = lazyState, modifier = Modifier.background(Color.Black, shape = RoundedCornerShape(8.dp)).fillMaxWidth().fillMaxHeight().padding(20.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                            items(
+                                if(uiState.tab == MainScreenModel.UiState.Tab.ERROR)
+                                    results.filterIsInstance<TestResult.Failure>().map { "${it.formula.toString()} expect=${it.expect} actual=${it.actual}" }
+                                else
+                                    results.filterIsInstance<TestResult.Success>().map { "${it.formula.toString()} result=${it.result}"}
+                            ){
+                                Text(it.toString(),
+                                    style = TextStyle(
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight(400),
+                                        textAlign = TextAlign.Center,
+                                    ),
+                                    color = Color.White
+                                )
+                            }
                         }
                     }
                 }
