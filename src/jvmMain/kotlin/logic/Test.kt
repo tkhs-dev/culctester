@@ -16,8 +16,16 @@ sealed class TestResult(val formula: Formula){
     data class Error(private val _formula: Formula, val error: Throwable): TestResult(_formula)
 
     sealed class Result(){
-        data class Number(val value: Int): Result()
-        object InvalidFormula: Result()
+        data class Number(val value: Int): Result(){
+            override fun toString(): String {
+                return value.toString()
+            }
+        }
+        object InvalidFormula: Result(){
+            override fun toString(): String {
+                return "InvalidFormula"
+            }
+        }
     }
 }
 
