@@ -22,7 +22,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logic.TestResult
 
 @Composable
@@ -146,7 +148,7 @@ fun MainScreen(screenModel: MainScreenModel){
             settingIntElem("数式の最大の長さ(文字)", uiState.maxLength, {screenModel.onUiStateChanged(uiState.copy(maxLength = it))})
             settingIntElem( "試行回数", uiState.trialCount, {screenModel.onUiStateChanged(uiState.copy(trialCount = it))})
             Box(Modifier.weight(1f))
-            ElevatedButton(onClick = { scope.launch{screenModel.onExecuteClicked()} },
+            ElevatedButton(onClick = { scope.launch{withContext(Dispatchers.Default){screenModel.onExecuteClicked()}} },
                 modifier = Modifier.width(300.dp).height(60.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A5D9)),
                 shape = RoundedCornerShape(size = 5.dp),
