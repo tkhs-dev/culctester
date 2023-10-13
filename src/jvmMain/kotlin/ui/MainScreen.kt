@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -43,7 +44,52 @@ fun MainScreen(screenModel: MainScreenModel){
         Row(Modifier.weight(1f)) {
             Box(Modifier.weight(1f))
             Column(modifier = Modifier.width(900.dp).padding(10.dp, 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Box(Modifier.background(Color.Black,shape = RoundedCornerShape(size = 5.dp)).height(90.dp).width(600.dp).align(Alignment.CenterHorizontally))
+                Box(Modifier.background(Color.Black,shape = RoundedCornerShape(size = 5.dp)).wrapContentHeight().heightIn(90.dp,150.dp).width(600.dp).align(Alignment.CenterHorizontally).padding(10.dp)){
+                    if(results.isNotEmpty()){
+                        Column {
+                            Text("実行結果",
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight(400),
+                                    textAlign = TextAlign.Center,
+                                    color = Color.White
+                                ),
+                            )
+                            Column(Modifier.padding(10.dp,0.dp,0.dp,0.dp)) {
+                                with(results.filterIsInstance<TestResult.Success>()){
+                                    Text("成功: $size ( ${size*100/results.size}% )",
+                                        style = TextStyle(
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight(400),
+                                            textAlign = TextAlign.Center,
+                                            color = Color.White
+                                        ),
+                                    )
+                                }
+                                with(results.filterIsInstance<TestResult.Failure>()){
+                                    Text("失敗: $size ( ${size*100/results.size}% )",
+                                        style = TextStyle(
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight(400),
+                                            textAlign = TextAlign.Center,
+                                            color = Color.White
+                                        ),
+                                    )
+                                }
+                                with(results.filterIsInstance<TestResult.Error>()){
+                                    Text("エラー: $size ( ${size*100/results.size}% )",
+                                        style = TextStyle(
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight(400),
+                                            textAlign = TextAlign.Center,
+                                            color = Color.White
+                                        ),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp,Alignment.End), modifier = Modifier.width(600.dp).height(50.dp).align(Alignment.CenterHorizontally)) {
                     ElevatedButton(onClick = {  },
                         modifier = Modifier.width(90.dp).height(35.dp),
@@ -60,20 +106,25 @@ fun MainScreen(screenModel: MainScreenModel){
                             )
                         )
                     }
-                    ElevatedButton(onClick = { scope.launch{screenModel.onRetryClicked()} },
+                    ElevatedButton(onClick = { scope.launch{ withContext(Dispatchers.Default){screenModel.onRetryClicked()}} },
                         modifier = Modifier.width(160.dp).height(35.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A5D9)),
                         shape = RoundedCornerShape(size = 5.dp),
                         contentPadding = PaddingValues(0.dp),
-                        elevation = ButtonDefaults.buttonElevation(5.dp)
+                        elevation = ButtonDefaults.buttonElevation(5.dp),
+                        enabled = !uiState.isLoading && results.isNotEmpty()
                         ) {
-                        Text("失敗ケースを再実行",
-                            style = TextStyle(
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight(700),
-                            textAlign = TextAlign.Center,
-                        )
-                        )
+                        if (uiState.isLoading) {
+                            CircularProgressIndicator(Modifier.scale(0.5f))
+                        } else {
+                            Text("再実行",
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight(700),
+                                    textAlign = TextAlign.Center,
+                                )
+                            )
+                        }
                     }
                 }
                 Column(Modifier.background(color = Color(0xFF383838), shape = RoundedCornerShape(size = 10.dp)).fillMaxWidth().fillMaxHeight()) {
@@ -133,7 +184,7 @@ fun MainScreen(screenModel: MainScreenModel){
             Box(Modifier.weight(1f))
         }
         Column(
-            verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
+            verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.Top),
             horizontalAlignment = Alignment.Start,
             modifier = Modifier.border(width = 1.dp, color = Color(0x1A000000), shape = RoundedCornerShape(size = 2.dp))
                 .width(395.dp)

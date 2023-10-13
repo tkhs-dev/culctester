@@ -41,7 +41,6 @@ class MainScreenModel() {
     }
 
     suspend fun onExecuteClicked() {
-        println("generate clicked")
         _uiState.value = _uiState.value.copy(isLoading = true)
         val op = mutableSetOf<Formula.Operator>()
         op.add(Formula.Operator.Add)
@@ -62,6 +61,14 @@ class MainScreenModel() {
     }
 
     suspend fun onRetryClicked() {
-        println("retry clicked")
+        _uiState.value = _uiState.value.copy(isLoading = true)
+        runBlocking(Dispatchers.Default) {
+            _testResults.value = _testResults.value.map { it.formula }
+                .map {
+                    async {
+                        Tester().test(it)
+                    }
+                }.awaitAll()
+        }.also { _uiState.value = _uiState.value.copy(isLoading = false) }
     }
 }
