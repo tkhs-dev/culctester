@@ -35,7 +35,7 @@ fun App() {
 }
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication, title = "計算機テストツール") {
+    Window(onCloseRequest = ::exitApplication, title = "計算機テストツール v1.0.0") {
         App()
     }
 }
