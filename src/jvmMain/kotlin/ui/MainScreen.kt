@@ -153,15 +153,19 @@ fun MainScreen(screenModel: MainScreenModel){
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00A5D9)),
                 shape = RoundedCornerShape(size = 5.dp),
                 contentPadding = PaddingValues(0.dp),
-                elevation = ButtonDefaults.buttonElevation(5.dp)
+                elevation = ButtonDefaults.buttonElevation(5.dp),
+                enabled = !uiState.isLoading
             ) {
-                Text("実行",
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight(700),
-                        textAlign = TextAlign.Center,
+                if(uiState.isLoading)
+                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(30.dp))
+                else
+                    Text("実行",
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight(700),
+                            textAlign = TextAlign.Center,
+                        )
                     )
-                )
             }
         }
     }

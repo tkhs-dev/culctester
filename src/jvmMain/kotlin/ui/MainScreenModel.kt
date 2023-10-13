@@ -21,6 +21,7 @@ class MainScreenModel() {
         val maxLength: Int = 200,
         val trialCount: Int = 100,
 
+        val isLoading: Boolean = false,
         val tab: Tab = Tab.ERROR,
     ){
         enum class Tab{
@@ -41,6 +42,7 @@ class MainScreenModel() {
 
     suspend fun onExecuteClicked() {
         println("generate clicked")
+        _uiState.value = _uiState.value.copy(isLoading = true)
         val op = mutableSetOf<Formula.Operator>()
         op.add(Formula.Operator.Add)
         if(_uiState.value.containSub) op.add(Formula.Operator.Sub)
@@ -56,7 +58,7 @@ class MainScreenModel() {
                         tester.test(f)
                     }
                 }.awaitAll()
-        }
+        }.also { _uiState.value = _uiState.value.copy(isLoading = false) }
     }
 
     suspend fun onRetryClicked() {
