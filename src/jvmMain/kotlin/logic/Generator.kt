@@ -7,8 +7,8 @@ import kotlin.random.Random
 class Generator(
     val operator: Set<Formula.Operator> = setOf(Formula.Operator.Add, Formula.Operator.Sub, Formula.Operator.Mul),
 ) {
-    suspend fun generate(depth:Int = 0, maxNum: Int = 10, allowNegative: Boolean = true): Formula {
-        return _generate(depth,maxNum, allowNegative, depth > 0 && Math.random() > 0.8)
+    suspend fun generate(depth:Int = 0, maxNum: Int = 10, allowNegative: Boolean = true, allowOuterBracket: Boolean = false): Formula {
+        return _generate(depth,maxNum, allowNegative, allowOuterBracket && depth > 0 && Math.random() > 0.8)
     }
     private suspend fun _generate(depth: Int, maxNum: Int, allowNegative: Boolean, isNested: Boolean): Formula {
         return withContext(Dispatchers.Default){

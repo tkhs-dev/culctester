@@ -110,9 +110,9 @@ fun MainScreen(screenModel: MainScreenModel){
                     LazyColumn(state = lazyState, modifier = Modifier.background(Color.Black, shape = RoundedCornerShape(8.dp)).fillMaxWidth().fillMaxHeight().padding(20.dp)) {
                         items(
                             if(uiState.tab == MainScreenModel.UiState.Tab.ERROR)
-                                results.filterIsInstance<TestResult.Failure>()
+                                results.filterIsInstance<TestResult.Failure>().map { "${it.formula.toString()} expect=${it.expect} actual=${it.actual}" }
                             else
-                                results.filterIsInstance<TestResult.Success>()
+                                results.filterIsInstance<TestResult.Success>().map { "${it.formula.toString()} result=${it.result}"}
                         ){
                             Text(it.toString(),
                                 style = TextStyle(
@@ -141,6 +141,7 @@ fun MainScreen(screenModel: MainScreenModel){
             settingBoolElem("乗算を含む", uiState.containMul, {screenModel.onUiStateChanged(uiState.copy(containMul = it))})
             settingBoolElem("二桁以上の整数を含む", uiState.containMoreDigits, {screenModel.onUiStateChanged(uiState.copy(containMoreDigits = it))})
             settingBoolElem("負の数を含む", uiState.containNegative, {screenModel.onUiStateChanged(uiState.copy(containNegative = it))})
+            settingBoolElem("全体を囲む括弧を許可する", uiState.allowOuterBracket, {screenModel.onUiStateChanged(uiState.copy(allowOuterBracket = it))})
             settingIntElem("ネストの深さ", uiState.depth, {screenModel.onUiStateChanged(uiState.copy(depth = it)) })
             settingIntElem("数式の最大の長さ(文字)", uiState.maxLength, {screenModel.onUiStateChanged(uiState.copy(maxLength = it))})
             settingIntElem( "試行回数", uiState.trialCount, {screenModel.onUiStateChanged(uiState.copy(trialCount = it))})

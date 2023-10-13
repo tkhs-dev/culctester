@@ -12,6 +12,7 @@ class MainScreenModel() {
         val containMul: Boolean = true,
         val containMoreDigits: Boolean = false,
         val containNegative: Boolean = false,
+        val allowOuterBracket: Boolean = false,
         val depth: Int = 0,
         val maxLength: Int = 200,
         val trialCount: Int = 100,
@@ -42,7 +43,7 @@ class MainScreenModel() {
         if(_uiState.value.containMul) op.add(Formula.Operator.Mul)
         val generator = Generator(op)
         val tester = Tester()
-        _testResults.value = (1.._uiState.value.trialCount).map { generator.generate(depth = _uiState.value.depth, maxNum = if(_uiState.value.containMoreDigits) 999 else 9, allowNegative = _uiState.value.containNegative) }
+        _testResults.value = (1.._uiState.value.trialCount).map { generator.generate(depth = _uiState.value.depth, maxNum = if(_uiState.value.containMoreDigits) 999 else 9, allowNegative = _uiState.value.containNegative, allowOuterBracket = _uiState.value.allowOuterBracket) }
             .map { tester.test(it) }
             .toList()
     }
