@@ -1,5 +1,5 @@
 # 数式計算プログラム テスト用アプリ
-![image](https://github.com/tkhs-dev/culctester/assets/38522336/a499bca1-1c65-4d14-a6b4-af07a00bbbae)
+![image](https://github.com/tkhs-dev/culctester/assets/38522336/9158f890-66ef-4948-be83-d6097192b05a)
 ## 概要
 入力された数式の文字列を解釈して計算する、数式計算プログラムをテストするためのソフトウェアです。
 主に大阪大学 プログラミングB(武政先生)の演習課題で作成するプログラムを対象としています。
