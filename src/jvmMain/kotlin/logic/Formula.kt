@@ -7,9 +7,10 @@ class Formula(private val operand1: Operand, private val operand2: Operand?, pri
         object Sub: Operator()
         object Mul: Operator()
         object Div: Operator()
+        object Pow: Operator()
     }
     sealed class Operand:Element{
-        data class Number(val value: Int): Operand(){
+        data class Number(val value: Double): Operand(){
             override fun toString(): String {
                 if(value < 0)
                     return "($value)"
@@ -35,6 +36,7 @@ class Formula(private val operand1: Operand, private val operand2: Operand?, pri
                         Operator.Div -> "/"
                         Operator.Mul -> "*"
                         Operator.Sub -> "-"
+                        Operator.Pow -> "^"
                     })
                 append(operand2)
             }

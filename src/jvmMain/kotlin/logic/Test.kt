@@ -9,6 +9,8 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.StringReader
+import java.lang.NumberFormatException
+import java.math.BigDecimal
 
 sealed class TestResult(val formula: Formula){
     data class Success(private val _formula: Formula, val result: Result): TestResult(_formula)
@@ -16,7 +18,7 @@ sealed class TestResult(val formula: Formula){
     data class Error(private val _formula: Formula, val error: Throwable): TestResult(_formula)
 
     sealed class Result(){
-        data class Number(val value: Int): Result(){
+        data class Number(val value: Double): Result(){
             override fun toString(): String {
                 return value.toString()
             }
@@ -31,11 +33,16 @@ sealed class TestResult(val formula: Formula){
                 return "Overflow"
             }
         }
+        data class Error(val error: String): Result(){
+            override fun toString(): String {
+                return error
+            }
+        }
     }
 }
 
 sealed class CalcResult{
-    data class Success(val formula: Formula, val result: Int): CalcResult()
+    data class Success(val formula: Formula, val result: Double): CalcResult()
     data class Failure(val formula: Formula, val result: String): CalcResult()
     data class Error(val formula: Formula, val error: Throwable): CalcResult()
 }
@@ -62,7 +69,7 @@ class Tester(){
             executor.streamHandler = PumpStreamHandler(output,error,input)
             executor.setExitValues(null)
             if(executor.execute(cmd) >= 0){
-                StringReader(output.toString()).readLines().last().toIntOrNull()?.let {
+                StringReader(output.toString()).readLines().last().toDoubleOrNull()?.let {
                     CalcResult.Success(formula,it)
                 } ?: CalcResult.Failure(formula,output.toString())
             }else{
@@ -81,24 +88,28 @@ class Tester(){
 
     fun test(formula: Formula): TestResult{
         val expect = runCatching {
-            ExpressionBuilder(formula.toString()).build().evaluate().toInt()
+            ExpressionBuilder(formula.toString()).build().evaluate()
+        }.map {
+            runCatching {
+                BigDecimal(it).toDouble()
+            }.getOrDefault(Double.MAX_VALUE)
         }.fold(
             onSuccess = {
                 CalcResult.Success(formula,it)
             },
             onFailure = {
-                if(it is IllegalArgumentException){
+                if(it is IllegalArgumentException || it is ArithmeticException ){
                     CalcResult.Failure(formula, it.message ?: "unknown error")
                 }else{
-                    TestResult.Error(formula,it)
+                    CalcResult.Error(formula,it)
                 }
             }
         )
         val actual = calcBySubject(formula)
         if(expect is CalcResult.Success && actual is CalcResult.Success){
-            if(expect.result == actual.result){
-                return TestResult.Success(formula,TestResult.Result.Number(expect.result))
-            }else if(expect.result == Int.MAX_VALUE || expect.result == Int.MIN_VALUE){
+            if(Math.abs(expect.result - actual.result) <= 1e10){
+                return TestResult.Success(formula,TestResult.Result.Number(actual.result))
+            }else if(expect.result == Double.MAX_VALUE || expect.result == Double.MIN_VALUE){
                 return TestResult.Failure(formula,TestResult.Result.Overflow,TestResult.Result.Overflow)
             }else{
                 return TestResult.Failure(formula,TestResult.Result.Number(expect.result),TestResult.Result.Number(actual.result))

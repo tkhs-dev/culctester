@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -192,14 +194,19 @@ fun MainScreen(screenModel: MainScreenModel){
                 .background(color = Color(0xFFFFFFFF), shape = RoundedCornerShape(size = 2.dp))
                 .padding(start = 38.dp, top = 40.dp, end = 14.dp, bottom = 35.dp)
         ) {
-            settingBoolElem("減算を含む", uiState.containSub, {screenModel.onUiStateChanged(uiState.copy(containSub = it))})
-            settingBoolElem("乗算を含む", uiState.containMul, {screenModel.onUiStateChanged(uiState.copy(containMul = it))})
-            settingBoolElem("二桁以上の整数を含む", uiState.containMoreDigits, {screenModel.onUiStateChanged(uiState.copy(containMoreDigits = it))})
-            settingBoolElem("負の数を含む", uiState.containNegative, {screenModel.onUiStateChanged(uiState.copy(containNegative = it))})
-            settingBoolElem("全体を囲む括弧を許可する", uiState.allowOuterBracket, {screenModel.onUiStateChanged(uiState.copy(allowOuterBracket = it))})
-            settingIntElem("ネストの深さ", uiState.depth, {screenModel.onUiStateChanged(uiState.copy(depth = it)) })
-            settingIntElem("数式の最大の長さ(文字)", uiState.maxLength, {screenModel.onUiStateChanged(uiState.copy(maxLength = it))})
-            settingIntElem( "試行回数", uiState.trialCount, {screenModel.onUiStateChanged(uiState.copy(trialCount = it))})
+            Column(Modifier.verticalScroll(rememberScrollState())){
+                settingBoolElem("減算を含む", uiState.containSub, {screenModel.onUiStateChanged(uiState.copy(containSub = it))})
+                settingBoolElem("乗算を含む", uiState.containMul, {screenModel.onUiStateChanged(uiState.copy(containMul = it))})
+                settingBoolElem("除算を含む", uiState.containDiv, {screenModel.onUiStateChanged(uiState.copy(containDiv = it))})
+                settingBoolElem("累乗を含む", uiState.containPow, {screenModel.onUiStateChanged(uiState.copy(containPow = it))})
+                settingBoolElem("二桁以上の整数を含む", uiState.containMoreDigits, {screenModel.onUiStateChanged(uiState.copy(containMoreDigits = it))})
+                settingBoolElem("負の数を含む", uiState.containNegative, {screenModel.onUiStateChanged(uiState.copy(containNegative = it))})
+                settingBoolElem("実数を含む", uiState.containReal, {screenModel.onUiStateChanged(uiState.copy(containReal = it))})
+                settingBoolElem("全体を囲む括弧を許可する", uiState.allowOuterBracket, {screenModel.onUiStateChanged(uiState.copy(allowOuterBracket = it))})
+                settingIntElem("ネストの深さ", uiState.depth, {screenModel.onUiStateChanged(uiState.copy(depth = it)) })
+                settingIntElem("数式の最大の長さ(文字)", uiState.maxLength, {screenModel.onUiStateChanged(uiState.copy(maxLength = it))})
+                settingIntElem( "試行回数", uiState.trialCount, {screenModel.onUiStateChanged(uiState.copy(trialCount = it))})
+            }
             Box(Modifier.weight(1f))
             ElevatedButton(onClick = { scope.launch{withContext(Dispatchers.Default){screenModel.onExecuteClicked()}} },
                 modifier = Modifier.width(300.dp).height(60.dp),

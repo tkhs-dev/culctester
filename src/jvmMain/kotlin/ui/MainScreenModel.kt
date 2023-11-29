@@ -12,10 +12,13 @@ import logic.Tester
 
 class MainScreenModel() {
     data class UiState(
-        val containSub: Boolean = false,
+        val containSub: Boolean = true,
         val containMul: Boolean = true,
+        val containDiv: Boolean = false,
+        val containPow: Boolean = false,
         val containMoreDigits: Boolean = false,
         val containNegative: Boolean = false,
+        val containReal: Boolean = false,
         val allowOuterBracket: Boolean = false,
         val depth: Int = 0,
         val maxLength: Int = 200,
@@ -46,6 +49,8 @@ class MainScreenModel() {
         op.add(Formula.Operator.Add)
         if(_uiState.value.containSub) op.add(Formula.Operator.Sub)
         if(_uiState.value.containMul) op.add(Formula.Operator.Mul)
+        if(_uiState.value.containDiv) op.add(Formula.Operator.Div)
+        if(_uiState.value.containPow) op.add(Formula.Operator.Pow)
         val generator = Generator(op)
         val tester = Tester()
 
@@ -53,13 +58,13 @@ class MainScreenModel() {
             (1.._uiState.value.trialCount)
                 .map {
                     async {
-                        var f = generator.generate(depth = _uiState.value.depth, maxNum = if(_uiState.value.containMoreDigits) 999 else 9, allowNegative = _uiState.value.containNegative, allowOuterBracket = _uiState.value.allowOuterBracket)
+                        var f = generator.generate(depth = _uiState.value.depth, maxNum = if(_uiState.value.containMoreDigits) 999 else 9, allowNegative = _uiState.value.containNegative, allowReal = _uiState.value.containReal, allowOuterBracket = _uiState.value.allowOuterBracket)
                         var count: Int = 0
                         while(f.toString().length > _uiState.value.maxLength){
-                            f = generator.generate(depth = _uiState.value.depth, maxNum = if(_uiState.value.containMoreDigits) 999 else 9, allowNegative = _uiState.value.containNegative, allowOuterBracket = _uiState.value.allowOuterBracket)
+                            f = generator.generate(depth = _uiState.value.depth, maxNum = if(_uiState.value.containMoreDigits) 999 else 9, allowNegative = _uiState.value.containNegative, allowReal = _uiState.value.containReal, allowOuterBracket = _uiState.value.allowOuterBracket)
                             count++
                             if(count > 100){
-                                f = Formula(Formula.Operand.Number(0),null,null)
+                                f = Formula(Formula.Operand.Number(0.0),null,null)
                                 break
                             }
                         }
